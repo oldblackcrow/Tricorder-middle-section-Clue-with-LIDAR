@@ -1,4 +1,5 @@
 What's inside this version? There are now 7 modes!
+![Heat Map](https://github.com/user-attachments/assets/6acf47bb-608d-4e46-bf2c-fc64e2c8e846)
 
 Mode 0 - The magnetometer Moire Pattern. Shows Heading and Field Strength
 
