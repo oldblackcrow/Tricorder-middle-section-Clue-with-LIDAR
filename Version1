@@ -38,7 +38,7 @@ bool mlx_connected = false;
 
 // LIDAR Lite v4 LED
 LIDARLite_v4LED lidar;
-bool lidar_connected = false;
+bool lidar_connected = true;
 
 // Interpolation function for the MLX90640 image:
 void interpolateThermalImage(float* input, int width, int height, int newWidth, int newHeight, float* output) {
@@ -328,10 +328,10 @@ void displayRadialMoire() {
   int fieldWidth = strlen(fieldBuf) * charWidth;
   
   int headingX = (canvas->width() - headingWidth) / 2;
-  int headingY = 25;
+  int headingY = 45;
   
   int fieldX = (canvas->width() - fieldWidth) / 2;
-  int fieldY = canvas->height() - 25 - charHeight;
+  int fieldY = canvas->height() - 35 - charHeight;
   
   int padding = 2;
   canvas->fillRect(headingX - padding, headingY - padding, headingWidth + 2 * padding, charHeight + 2 * padding, COLOR_WHITE);
@@ -590,7 +590,7 @@ void plotBuffer(GFXcanvas16 *canvas, CircularBuffer<float, PLOT_W> &buffer, cons
   canvas->setTextSize(3);
   canvas->setTextColor(TITLE_COLOR);
   uint16_t title_len = strlen(title) * 12;
-  canvas->setCursor((canvas->width() - title_len) / 2, 20);
+  canvas->setCursor((canvas->width() - title_len) / 2, 30);
   canvas->print(title);
   
   float minY = 0, maxY = 0;
@@ -635,7 +635,7 @@ void plotColorBuffer(GFXcanvas16 *canvas,
   canvas->setTextSize(3);
   canvas->setTextColor(TITLE_COLOR);
   uint16_t title_len = strlen(title) * 12;
-  canvas->setCursor((canvas->width() - title_len) / 2, 20);
+  canvas->setCursor(75, 30);
   canvas->print(title);
   
   float minVal = 1e6, maxVal = -1e6;
@@ -735,7 +735,7 @@ void displayBTData() {
   canvas->setTextSize(3);
   canvas->setTextColor(__builtin_bswap16(ARCADA_GREEN));
   const char *sensorName = "ENV";
-  canvas->setCursor(95, cy - 100);
+  canvas->setCursor(95, cy - 90);
   canvas->print(sensorName);
 
   char buffer[20];
@@ -1086,9 +1086,22 @@ void setup() {
     mlx_connected = false;
   } else {
     mlx_connected = true;
-  // LIDAR Lite v4 LED init
+  
+// LIDAR Lite v4 LED init
   lidar.configure();      // load default settings
-  lidar_connected = true; // no begin() to check
+
+// Increase SNR by averaging 50 acquisitions per measurement
+{
+  uint8_t acqCount = 50;
+  lidar.write(0xEB, &acqCount, 1);
+}
+// Ensure “always-on” power mode for maximum range
+{
+  uint8_t powerMode = 0x80;
+  lidar.write(0xE2, &powerMode, 1);
+}
+
+lidar_connected = true; // no begin() check needed
 
   }
   
